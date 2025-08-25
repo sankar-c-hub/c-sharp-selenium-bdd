@@ -1,0 +1,6 @@
+LoginPage: { 
+    usernamexpath: { by: xpath, value: "//input[@placeholder='Username']" }, 
+    passwordxpath: { by: xpath, value: "//input[@placeholder='Password']" },
+    loginbuttonxpath: { by: xpath, value: "//button[normalize-space()='Login']" } 
+}
+

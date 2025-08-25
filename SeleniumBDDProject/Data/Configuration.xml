@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+	<Url>https://opensource-demo.orangehrmlive.com/web/index.php/auth/login</Url>
+	<BrowserType>chrome</BrowserType>
+	<Headless>False</Headless>
+	<EnableWebdriverPath>false</EnableWebdriverPath>
+	<EnableIncognito>false</EnableIncognito>
+	<ImplicitWait>10</ImplicitWait>
+	<EnableEachScreenshot>true</EnableEachScreenshot>
+</Configuration>
