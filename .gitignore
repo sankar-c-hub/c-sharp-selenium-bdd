@@ -1,0 +1,6 @@
+.vs/
+bin/
+obj/
+Reports/
+Data/      ← (only if it contains temp/test files, not configs)
+Resources/ ← (only if it contains binaries or secrets)
