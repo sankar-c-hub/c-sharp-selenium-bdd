@@ -1,7 +1,7 @@
 {
   "URL": "https://demowebshop.tricentis.com",
   "BrowserType": "Chrome",
-  "EnableIncognito": false,
+  "EnableIncognito": true,
   "EnableHeadless": false,
   "EnableWebdriverPath": "Na",
   "PrintTextInConsole": false,
