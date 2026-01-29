@@ -28,21 +28,14 @@ pipeline {
 
         stage('Build & Run Tests') {
             steps {
-                echo '🚀 Cleaning, building, and running tests inside BddSelenium folder...'
+                echo '🚀 Building and running tests...'
                 sh '''
                     cd BddSelenium
-        
-                    dotnet clean
-                    dotnet restore
-                    dotnet build --configuration Release
-                    dotnet test \
-                        --configuration Release \
-                        --no-build \
-                        --logger "trx;LogFileName=test-results.trx"
+                    dotnet build
+                    dotnet test
                 '''
             }
         }
-
 
         stage('Publish Reports') {
             steps {
@@ -50,26 +43,6 @@ pipeline {
             }
         }
     }
-
-    post {
-        always {
-            echo '📦 Archiving test results and reports...'
-    
-            // NUnit / TRX results
-            junit '**/TestResults/*.trx'
-    
-            // Your custom report folder
-            archiveArtifacts artifacts: 'BddSelenium/reports/**', allowEmptyArchive: true
-        }
-    
-        success {
-            echo '✅ Tests passed'
-        }
-    
-        failure {
-            echo '❌ Tests failed'
-        }
 }
 
-}
 
