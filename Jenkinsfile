@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        dotnet 'dotnet8'
-    }
-
     environment {
         DOTNET_CLI_TELEMETRY_OPTOUT = '1'
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
@@ -13,14 +9,16 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
+                echo '📥 Cloning repository...'
                 checkout scm
             }
         }
 
         stage('Verify Environment') {
             steps {
+                echo '🔍 Checking .NET & Chrome versions...'
                 sh '''
                     dotnet --version
                     google-chrome --version || chromium-browser --version
@@ -28,43 +26,45 @@ pipeline {
             }
         }
 
-        stage('Restore') {
+        stage('Build & Run Tests') {
             steps {
-                sh 'dotnet restore BddSelenium.sln'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh 'dotnet build BddSelenium.sln --configuration Release --no-restore'
-            }
-        }
-
-        stage('Test') {
-            steps {
+                echo '🚀 Restoring, building, and running tests...'
                 sh '''
+                    dotnet restore BddSelenium.sln
+                    dotnet build BddSelenium.sln --configuration Release --no-restore
                     dotnet test BddSelenium.sln \
-                    --configuration Release \
-                    --no-build \
-                    --logger "trx;LogFileName=test-results.trx"
+                        --configuration Release \
+                        --no-build \
+                        --logger "trx;LogFileName=test-results.trx"
                 '''
+            }
+        }
+
+        stage('Publish Reports') {
+            steps {
+                echo '📊 Publishing test reports...'
             }
         }
     }
 
     post {
         always {
-            echo 'Publishing test results...'
+            echo '📦 Archiving test results and reports...'
+    
+            // NUnit / TRX results
             junit '**/TestResults/*.trx'
-            archiveArtifacts artifacts: '**/TestResults/**', allowEmptyArchive: true
+    
+            // Your custom report folder
+            archiveArtifacts artifacts: 'BddSelenium/reports/**', allowEmptyArchive: true
         }
-
-        failure {
-            echo '❌ Build failed'
-        }
-
+    
         success {
-            echo '✅ Build and tests passed'
+            echo '✅ Tests passed'
         }
-    }
+    
+        failure {
+            echo '❌ Tests failed'
+        }
+}
+
 }
