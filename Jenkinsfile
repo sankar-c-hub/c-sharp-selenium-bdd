@@ -1,66 +1,70 @@
-switch ("${scm.branches[0].name}") {
-case "staging":
-  ALGOQA_DATA_BUCKET = "algoqastaging"
-  break
-case "preprod":
-  ALGOQA_DATA_BUCKET = "algoqapreprod"
-  break
-case "main":
-  ALGOQA_DATA_BUCKET = "algoqaproduction"
-  break
-default:
-  ALGOQA_DATA_BUCKET = "algoqastaging"
-  break
-}
-
 pipeline {
+    agent any
 
-  agent any
-
-  options {
-    disableConcurrentBuilds()
-  }
-
-  stages {
-
-    stage("Clean Workspace") {
-      steps {
-        script {
-          cleanWs()
-        }
-      }
+    tools {
+        dotnet 'dotnet8'
     }
 
-    stage("GitHub Clone") {
-      steps {
-        script {
-          sh """
-          echo "The Source Repo branch is ${scm.branches[0].name}"
-          echo "The target S3 bucket is ${ALGOQA_DATA_BUCKET}"
-          """
-          checkout scm
-        }
-      }
+    environment {
+        DOTNET_CLI_TELEMETRY_OPTOUT = '1'
+        DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
+        ASPNETCORE_ENVIRONMENT = 'CI'
     }
 
-    stage("Publish AlgoQA Attachment to S3 Bucket") {
-      steps {
-        script {
-          sh """ 
-            aws s3 cp ./algoAF_attachments s3://${ALGOQA_DATA_BUCKET}/AlgoQA_Data/algoAF_attachments --acl public-read --recursive
-          """
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
         }
-      }
+
+        stage('Verify Environment') {
+            steps {
+                sh '''
+                    dotnet --version
+                    google-chrome --version || chromium-browser --version
+                '''
+            }
+        }
+
+        stage('Restore') {
+            steps {
+                sh 'dotnet restore BddSelenium.sln'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'dotnet build BddSelenium.sln --configuration Release --no-restore'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh '''
+                    dotnet test BddSelenium.sln \
+                    --configuration Release \
+                    --no-build \
+                    --logger "trx;LogFileName=test-results.trx"
+                '''
+            }
+        }
     }
 
-    stage("Publish AlgoQA CodeSnippet to S3 Bucket") {
-      steps {
-        script {
-          sh """ 
-            aws s3 cp ./codeSnippet s3://${ALGOQA_DATA_BUCKET}/AlgoQA_Data/codeSnippet --acl public-read --recursive
-          """
+    post {
+        always {
+            echo 'Publishing test results...'
+            junit '**/TestResults/*.trx'
+            archiveArtifacts artifacts: '**/TestResults/**', allowEmptyArchive: true
         }
-      }
+
+        failure {
+            echo '❌ Build failed'
+        }
+
+        success {
+            echo '✅ Build and tests passed'
+        }
     }
-  }
 }
