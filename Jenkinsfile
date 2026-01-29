@@ -28,17 +28,21 @@ pipeline {
 
         stage('Build & Run Tests') {
             steps {
-                echo '🚀 Restoring, building, and running tests...'
+                echo '🚀 Cleaning, building, and running tests inside BddSelenium folder...'
                 sh '''
-                    dotnet restore BddSelenium.sln
-                    dotnet build BddSelenium.sln --configuration Release --no-restore
-                    dotnet test BddSelenium.sln \
+                    cd BddSelenium
+        
+                    dotnet clean
+                    dotnet restore
+                    dotnet build --configuration Release
+                    dotnet test \
                         --configuration Release \
                         --no-build \
                         --logger "trx;LogFileName=test-results.trx"
                 '''
             }
         }
+
 
         stage('Publish Reports') {
             steps {
@@ -68,3 +72,4 @@ pipeline {
 }
 
 }
+
