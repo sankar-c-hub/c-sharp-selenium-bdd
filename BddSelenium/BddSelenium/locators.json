@@ -1,0 +1,22 @@
+{
+  "Demo Web Shop": {
+    "BooksLinkXPATH": "(//a[contains(.,'Books')])[1]",
+    "ComputersLinkXPATH": "(//a[contains(.,'Computers')])[1]",
+    "ElectronicsLinkXPATH": "(//a[contains(.,'Electronics')])[1]",
+    "ApparelShoesLinkXPATH": "(//a[contains(.,'Apparel & Shoes')])[1]",
+    "DigitaldownloadsLinkXPATH": "(//a[contains(.,'Digital downloads')])[1]",
+    "JewelryLinkXPATH": "(//a[contains(.,'Jewelry')])[1]",
+    "GiftCardsLinkXPATH": "(//a[contains(.,'Gift Cards')])[1]",
+    "RegisterLinkXPATH": "//a[contains(.,'Register')]",
+    "LoginLinkXPATH": "//a[contains(.,'Log in')]",
+    "ShoppingcartLinkXPATH": "//span[contains(.,'Shopping cart')]",
+    "WishlistLinkXPATH": "//span[contains(.,'Wishlist')]"
+  },
+  "Demo Web Shop Login": {
+    "Email2TextBoxXPATH": "//input[@id='Email']",
+    "Password2TextBoxXPATH": "//input[@id='Password']"
+  },
+  "NA": {
+    "Login2ButtonXPATH": "(//input[@type='submit'])[2]"
+  }
+}
